@@ -69,6 +69,10 @@ export async function getFoodLibrary(
 }
 
 export async function deleteFood(babyId: string, foodId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
   const { error } = await getAdminClient()
     .from("food_items")
     .delete()

@@ -29,6 +29,10 @@ export async function logFood(
 }
 
 export async function deleteFoodLog(babyId: string, logId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
   const { error } = await getAdminClient()
     .from("food_logs")
     .delete()

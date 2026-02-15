@@ -49,12 +49,19 @@ export async function getBaby(id: string) {
 }
 
 export async function deleteBaby(id: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
   const { error } = await getAdminClient().from("babies").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/dashboard");
 }
 
 export async function inviteMember(babyId: string, email: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
   const { data: users, error: lookupError } = await getAdminClient()
     .rpc("get_user_id_by_email", { p_email: email });
@@ -89,6 +96,10 @@ export async function getMembers(babyId: string) {
 }
 
 export async function removeMember(babyId: string, userId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
   const { error } = await getAdminClient()
     .from("baby_members")
     .delete()
