@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 export async function logFood(
@@ -15,7 +16,7 @@ export async function logFood(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  const { error } = await supabase.from("food_logs").insert({
+  const { error } = await getAdminClient().from("food_logs").insert({
     baby_id: babyId,
     food_item_id: foodItemId,
     fed_at: fedAt,
@@ -28,8 +29,7 @@ export async function logFood(
 }
 
 export async function deleteFoodLog(babyId: string, logId: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
+  const { error } = await getAdminClient()
     .from("food_logs")
     .delete()
     .eq("id", logId)

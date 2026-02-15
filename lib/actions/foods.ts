@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { getAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { FoodCategory, FoodItemWithDaysSince } from "@/lib/types/database";
 
@@ -15,7 +16,7 @@ export async function createFood(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  const { data, error } = await supabase
+  const { data, error } = await getAdminClient()
     .from("food_items")
     .insert({ baby_id: babyId, name, category, created_by: user.id })
     .select()
@@ -68,8 +69,7 @@ export async function getFoodLibrary(
 }
 
 export async function deleteFood(babyId: string, foodId: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
+  const { error } = await getAdminClient()
     .from("food_items")
     .delete()
     .eq("id", foodId)
