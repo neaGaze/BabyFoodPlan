@@ -72,8 +72,11 @@ export function LogFoodDialog({
     }
   }, [open, food, foods, defaultDate, defaultTime]);
 
+  // Sync fallback: if effect hasn't set selectedFoodId yet, use first food
+  const effectiveFoodId =
+    selectedFoodId || (!food && foods?.length ? foods[0].id : "");
   const resolvedFood =
-    food ?? foods?.find((f) => f.id === selectedFoodId) ?? null;
+    food ?? foods?.find((f) => f.id === effectiveFoodId) ?? null;
   const showPicker = !food && foods && foods.length > 0;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -114,7 +117,7 @@ export function LogFoodDialog({
           {showPicker && (
             <div className="space-y-2">
               <Label>Food</Label>
-              <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
+              <Select value={effectiveFoodId} onValueChange={setSelectedFoodId}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pick a food..." />
                 </SelectTrigger>
