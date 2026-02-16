@@ -48,8 +48,7 @@ export async function getFoodLogsByDateRange(
   startDate: string,
   endDate: string
 ) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error } = await getAdminClient()
     .from("food_logs")
     .select("*, food_items(name, category)")
     .eq("baby_id", babyId)

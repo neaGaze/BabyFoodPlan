@@ -30,10 +30,10 @@ export async function createFood(
 export async function getFoodLibrary(
   babyId: string
 ): Promise<{ data: FoodItemWithDaysSince[] | null; error?: string }> {
-  const supabase = await createClient();
+  const admin = getAdminClient();
 
   // Get all food items for this baby
-  const { data: foods, error } = await supabase
+  const { data: foods, error } = await admin
     .from("food_items")
     .select("*")
     .eq("baby_id", babyId)
@@ -43,7 +43,7 @@ export async function getFoodLibrary(
   if (!foods?.length) return { data: [] };
 
   // Get latest food log for each food item
-  const { data: logs } = await supabase
+  const { data: logs } = await admin
     .from("food_logs")
     .select("food_item_id, fed_at")
     .eq("baby_id", babyId)

@@ -27,9 +27,20 @@ export async function createBaby(formData: FormData) {
 
 export async function getBabies() {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated", data: null };
+
+  // Get baby IDs where user is a member
+  const { data: memberships } = await getAdminClient()
+    .from("baby_members")
+    .select("baby_id")
+    .eq("user_id", user.id);
+  const memberBabyIds = memberships?.map((m) => m.baby_id) ?? [];
+
+  const { data, error } = await getAdminClient()
     .from("babies")
     .select("*")
+    .or(`created_by.eq.${user.id}${memberBabyIds.length ? `,id.in.(${memberBabyIds.join(",")})` : ""}`)
     .order("created_at", { ascending: false });
 
   if (error) return { error: error.message, data: null };
@@ -37,8 +48,7 @@ export async function getBabies() {
 }
 
 export async function getBaby(id: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error } = await getAdminClient()
     .from("babies")
     .select("*")
     .eq("id", id)
@@ -85,8 +95,7 @@ export async function inviteMember(babyId: string, email: string) {
 }
 
 export async function getMembers(babyId: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error } = await getAdminClient()
     .from("baby_members")
     .select("*, profiles(full_name, avatar_url)")
     .eq("baby_id", babyId);
