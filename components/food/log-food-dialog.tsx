@@ -49,14 +49,28 @@ export function LogFoodDialog({
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState(false);
 
+  // Reset state when dialog opens
   useEffect(() => {
-    if (food) setSelectedFoodId(food.id);
-  }, [food]);
+    if (!open) return;
+    const now = new Date();
+    setNotes("");
+    setPending(false);
+    setDate(defaultDate ?? now.toISOString().slice(0, 10));
+    setTime(defaultTime ?? now.toTimeString().slice(0, 5));
 
-  useEffect(() => {
-    if (defaultDate) setDate(defaultDate);
-    if (defaultTime) setTime(defaultTime);
-  }, [defaultDate, defaultTime]);
+    if (food) {
+      setSelectedFoodId(food.id);
+    } else if (foods?.length) {
+      // Auto-select first food so button is immediately enabled
+      setSelectedFoodId((prev) => {
+        // Keep previous selection if still valid
+        if (prev && foods.some((f) => f.id === prev)) return prev;
+        return foods[0].id;
+      });
+    } else {
+      setSelectedFoodId("");
+    }
+  }, [open, food, foods, defaultDate, defaultTime]);
 
   const resolvedFood =
     food ?? foods?.find((f) => f.id === selectedFoodId) ?? null;
@@ -92,11 +106,16 @@ export function LogFoodDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!food && foods && foods.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No foods in library. Add a food first from the Foods tab.
+            </p>
+          )}
           {showPicker && (
             <div className="space-y-2">
               <Label>Food</Label>
               <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pick a food..." />
                 </SelectTrigger>
                 <SelectContent>
