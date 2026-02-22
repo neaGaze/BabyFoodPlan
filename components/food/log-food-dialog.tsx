@@ -61,9 +61,7 @@ export function LogFoodDialog({
     if (food) {
       setSelectedFoodId(food.id);
     } else if (foods?.length) {
-      // Auto-select first food so button is immediately enabled
       setSelectedFoodId((prev) => {
-        // Keep previous selection if still valid
         if (prev && foods.some((f) => f.id === prev)) return prev;
         return foods[0].id;
       });
@@ -72,32 +70,43 @@ export function LogFoodDialog({
     }
   }, [open, food, foods, defaultDate, defaultTime]);
 
-  // Sync fallback: if effect hasn't set selectedFoodId yet, use first food
-  const effectiveFoodId =
-    selectedFoodId || (!food && foods?.length ? foods[0].id : "");
-  const resolvedFood =
-    food ?? foods?.find((f) => f.id === effectiveFoodId) ?? null;
+  // Resolve which food to log: prop > selected > first in list
+  const resolvedFood = food
+    || (foods?.length && selectedFoodId && foods.find((f) => f.id === selectedFoodId))
+    || (foods?.length ? foods[0] : null);
+
+  const effectiveFoodId = resolvedFood?.id ?? "";
   const showPicker = !food && foods && foods.length > 0;
+  const noFoods = !food && (!foods || foods.length === 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!resolvedFood) return;
-    setPending(true);
-    const fedAt = new Date(`${date}T${time}`).toISOString();
-    const result = await logFood(
-      babyId,
-      resolvedFood.id,
-      fedAt,
-      notes || undefined
-    );
-    setPending(false);
-    if (result?.error) {
-      toast.error(result.error);
+    if (!resolvedFood) {
+      toast.error("No food selected");
       return;
     }
-    toast.success(`Logged ${resolvedFood.name}`);
-    setNotes("");
-    onOpenChange(false);
+    setPending(true);
+    try {
+      const fedAt = new Date(`${date}T${time}`).toISOString();
+      const result = await logFood(
+        babyId,
+        resolvedFood.id,
+        fedAt,
+        notes || undefined
+      );
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(`Logged ${resolvedFood.name}`);
+      setNotes("");
+      onOpenChange(false);
+    } catch (err) {
+      toast.error("Failed to log food");
+      console.error("[LogFoodDialog] submit error:", err);
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -109,7 +118,7 @@ export function LogFoodDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!food && foods && foods.length === 0 && (
+          {noFoods && (
             <p className="text-sm text-muted-foreground">
               No foods in library. Add a food first from the Foods tab.
             </p>
@@ -165,7 +174,7 @@ export function LogFoodDialog({
           <Button
             type="submit"
             className="w-full"
-            disabled={pending || !resolvedFood}
+            disabled={pending || noFoods}
           >
             {pending ? "Logging..." : "Log feeding"}
           </Button>
