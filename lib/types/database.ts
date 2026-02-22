@@ -87,7 +87,7 @@ export type Database = {
           id: string;
           baby_id: string;
           name: string;
-          category: string;
+          category: string[];
           created_by: string | null;
           created_at: string;
         };
@@ -95,7 +95,7 @@ export type Database = {
           id?: string;
           baby_id: string;
           name: string;
-          category?: string;
+          category?: string[];
           created_by?: string | null;
           created_at?: string;
         };
@@ -103,7 +103,7 @@ export type Database = {
           id?: string;
           baby_id?: string;
           name?: string;
-          category?: string;
+          category?: string[];
           created_by?: string | null;
           created_at?: string;
         };
@@ -191,6 +191,7 @@ export type FoodCategory =
   | "grain"
   | "protein"
   | "dairy"
+  | "snack"
   | "other";
 
 export type FoodItemWithDaysSince = FoodItem & {
@@ -201,6 +202,16 @@ export type FoodItemWithDaysSince = FoodItem & {
 export type FoodLogWithItem = FoodLog & {
   food_items: Pick<FoodItem, "name" | "category">;
 };
+
+export const ALL_FOOD_CATEGORIES: FoodCategory[] = [
+  "fruit",
+  "veggie",
+  "grain",
+  "protein",
+  "dairy",
+  "snack",
+  "other",
+];
 
 export type BabyMemberWithProfile = BabyMember & {
   profiles: Pick<Profile, "full_name" | "avatar_url">;

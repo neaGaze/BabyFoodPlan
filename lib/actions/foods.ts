@@ -8,7 +8,7 @@ import { FoodCategory, FoodItemWithDaysSince } from "@/lib/types/database";
 export async function createFood(
   babyId: string,
   name: string,
-  category: FoodCategory
+  category: FoodCategory[]
 ) {
   const supabase = await createClient();
   const {

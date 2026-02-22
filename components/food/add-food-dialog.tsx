@@ -11,37 +11,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { createFood } from "@/lib/actions/foods";
-import { FoodCategory } from "@/lib/types/database";
+import { FoodCategory, ALL_FOOD_CATEGORIES } from "@/lib/types/database";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
-const categories: { value: FoodCategory; label: string }[] = [
-  { value: "fruit", label: "Fruit" },
-  { value: "veggie", label: "Veggie" },
-  { value: "grain", label: "Grain" },
-  { value: "protein", label: "Protein" },
-  { value: "dairy", label: "Dairy" },
-  { value: "other", label: "Other" },
-];
+const categoryLabels: Record<FoodCategory, string> = {
+  fruit: "Fruit",
+  veggie: "Veggie",
+  grain: "Grain",
+  protein: "Protein",
+  dairy: "Dairy",
+  snack: "Snack",
+  other: "Other",
+};
 
 export function AddFoodDialog({ babyId }: { babyId: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [category, setCategory] = useState<FoodCategory>("other");
+  const [categories, setCategories] = useState<FoodCategory[]>(["other"]);
   const [pending, setPending] = useState(false);
+
+  function toggleCategory(cat: FoodCategory) {
+    setCategories((prev) => {
+      if (prev.includes(cat)) {
+        const next = prev.filter((c) => c !== cat);
+        return next.length === 0 ? prev : next;
+      }
+      return [...prev, cat];
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
-    const result = await createFood(babyId, name, category);
+    const result = await createFood(babyId, name, categories);
     setPending(false);
     if (result?.error) {
       toast.error(result.error);
@@ -49,7 +53,7 @@ export function AddFoodDialog({ babyId }: { babyId: string }) {
     }
     toast.success("Food added");
     setName("");
-    setCategory("other");
+    setCategories(["other"]);
     setOpen(false);
   }
 
@@ -76,22 +80,20 @@ export function AddFoodDialog({ babyId }: { babyId: string }) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Category</Label>
-            <Select
-              value={category}
-              onValueChange={(v) => setCategory(v as FoodCategory)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Categories</Label>
+            <div className="flex gap-1.5 flex-wrap">
+              {ALL_FOOD_CATEGORIES.map((cat) => (
+                <Button
+                  key={cat}
+                  type="button"
+                  size="sm"
+                  variant={categories.includes(cat) ? "default" : "outline"}
+                  onClick={() => toggleCategory(cat)}
+                >
+                  {categoryLabels[cat]}
+                </Button>
+              ))}
+            </div>
           </div>
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Adding..." : "Add food"}

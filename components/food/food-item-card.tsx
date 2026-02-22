@@ -7,6 +7,7 @@ import { FoodItemWithDaysSince } from "@/lib/types/database";
 import { Trash2 } from "lucide-react";
 import { deleteFood } from "@/lib/actions/foods";
 import { toast } from "sonner";
+import { normalizeCategory } from "@/lib/utils";
 
 const categoryEmoji: Record<string, string> = {
   fruit: "🍎",
@@ -14,6 +15,7 @@ const categoryEmoji: Record<string, string> = {
   grain: "🌾",
   protein: "🍗",
   dairy: "🧀",
+  snack: "🍪",
   other: "🍽️",
 };
 
@@ -56,7 +58,7 @@ export function FoodItemCard({
       onClick={() => onSelect?.(food)}
     >
       <div className="flex items-center gap-2 min-w-0">
-        <span className="text-lg">{categoryEmoji[food.category]}</span>
+        <span className="text-lg">{normalizeCategory(food.category).map((c) => categoryEmoji[c]).join("")}</span>
         <span className="font-medium truncate">{food.name}</span>
       </div>
       <div className="flex items-center gap-2 shrink-0">

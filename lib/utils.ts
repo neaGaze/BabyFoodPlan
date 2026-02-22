@@ -38,6 +38,11 @@ export function getMonthDates(year: number, month: number): Date[] {
   return dates;
 }
 
+/** Normalize category to string[] — handles old string DB data */
+export function normalizeCategory(cat: string | string[]): string[] {
+  return Array.isArray(cat) ? cat : [cat];
+}
+
 export function isSameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&

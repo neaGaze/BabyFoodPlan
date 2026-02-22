@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { FoodLogWithItem } from "@/lib/types/database";
-import { formatTime } from "@/lib/utils";
+import { formatTime, normalizeCategory } from "@/lib/utils";
 import { X } from "lucide-react";
 import { deleteFoodLog } from "@/lib/actions/food-logs";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ const categoryColor: Record<string, string> = {
   grain: "bg-amber-100 text-amber-700 hover:bg-amber-100",
   protein: "bg-orange-100 text-orange-700 hover:bg-orange-100",
   dairy: "bg-blue-100 text-blue-700 hover:bg-blue-100",
+  snack: "bg-purple-100 text-purple-700 hover:bg-purple-100",
   other: "bg-gray-100 text-gray-700 hover:bg-gray-100",
 };
 
@@ -40,7 +41,7 @@ export function FoodEntry({
       )}
       <Badge
         variant="secondary"
-        className={`${categoryColor[log.food_items.category]} text-xs`}
+        className={`${categoryColor[normalizeCategory(log.food_items.category)[0]] || categoryColor.other} text-xs`}
       >
         {log.food_items.name}
       </Badge>

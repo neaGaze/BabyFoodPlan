@@ -4,18 +4,19 @@ import { useState } from "react";
 import { FoodItemCard } from "./food-item-card";
 import { AddFoodDialog } from "./add-food-dialog";
 import { LogFoodDialog } from "./log-food-dialog";
-import { FoodCategory, FoodItemWithDaysSince } from "@/lib/types/database";
+import { FoodCategory, FoodItemWithDaysSince, ALL_FOOD_CATEGORIES } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
+import { normalizeCategory } from "@/lib/utils";
 
-const categories: { value: FoodCategory | "all"; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "fruit", label: "Fruit" },
-  { value: "veggie", label: "Veggie" },
-  { value: "grain", label: "Grain" },
-  { value: "protein", label: "Protein" },
-  { value: "dairy", label: "Dairy" },
-  { value: "other", label: "Other" },
-];
+const categoryLabels: Record<FoodCategory, string> = {
+  fruit: "Fruit",
+  veggie: "Veggie",
+  grain: "Grain",
+  protein: "Protein",
+  dairy: "Dairy",
+  snack: "Snack",
+  other: "Other",
+};
 
 export function FoodLibrary({
   foods,
@@ -30,7 +31,7 @@ export function FoodLibrary({
   const [logOpen, setLogOpen] = useState(false);
 
   const filtered =
-    filter === "all" ? foods : foods.filter((f) => f.category === filter);
+    filter === "all" ? foods : foods.filter((f) => normalizeCategory(f.category).includes(filter));
 
   function handleSelect(food: FoodItemWithDaysSince) {
     setSelectedFood(food);
@@ -45,14 +46,21 @@ export function FoodLibrary({
       </div>
 
       <div className="flex gap-1 flex-wrap">
-        {categories.map((c) => (
+        <Button
+          variant={filter === "all" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFilter("all")}
+        >
+          All
+        </Button>
+        {ALL_FOOD_CATEGORIES.map((cat) => (
           <Button
-            key={c.value}
-            variant={filter === c.value ? "default" : "outline"}
+            key={cat}
+            variant={filter === cat ? "default" : "outline"}
             size="sm"
-            onClick={() => setFilter(c.value)}
+            onClick={() => setFilter(cat)}
           >
-            {c.label}
+            {categoryLabels[cat]}
           </Button>
         ))}
       </div>
