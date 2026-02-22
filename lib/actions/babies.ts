@@ -77,7 +77,7 @@ export async function inviteMember(babyId: string, email: string) {
     .rpc("get_user_id_by_email", { p_email: email });
 
   if (lookupError || !users) {
-    return { error: "User not found. They must register first." };
+    return { error: "User not found. They need to create an account first." };
   }
 
   const userId = users as unknown as string;
@@ -87,11 +87,12 @@ export async function inviteMember(babyId: string, email: string) {
     .insert({ baby_id: babyId, user_id: userId, role: "member" });
 
   if (error) {
-    if (error.code === "23505") return { error: "User already a member" };
+    if (error.code === "23505") return { error: "This person is already a member" };
     return { error: error.message };
   }
 
   revalidatePath(`/baby/${babyId}/members`);
+  return { success: true };
 }
 
 export async function getMembers(babyId: string) {
@@ -117,4 +118,5 @@ export async function removeMember(babyId: string, userId: string) {
 
   if (error) return { error: error.message };
   revalidatePath(`/baby/${babyId}/members`);
+  return { success: true };
 }

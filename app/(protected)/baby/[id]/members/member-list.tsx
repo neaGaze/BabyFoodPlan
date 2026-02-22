@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,9 +21,16 @@ export function MemberList({
   currentUserId: string;
   isOwner: boolean;
 }) {
+  const router = useRouter();
+
   async function handleRemove(userId: string) {
     const result = await removeMember(babyId, userId);
-    if (result?.error) toast.error(result.error);
+    if (result?.error) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success("Member removed");
+    router.refresh();
   }
 
   if (members.length === 0) {
