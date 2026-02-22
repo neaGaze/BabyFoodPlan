@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BabyMemberWithProfile } from "@/lib/types/database";
 import { removeMember } from "@/lib/actions/babies";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Users } from "lucide-react";
 
 export function MemberList({
   members,
@@ -25,16 +25,27 @@ export function MemberList({
     if (result?.error) toast.error(result.error);
   }
 
+  if (members.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Users className="h-10 w-10 text-muted-foreground mb-3" />
+        <p className="text-muted-foreground">
+          No members yet. Invite someone to help track meals!
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       {members.map((member) => (
         <Card
           key={member.id}
-          className="p-3 flex items-center justify-between"
+          className="p-3 flex items-center justify-between border-pink-200/40 shadow-sm"
         >
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>
+            <Avatar className="h-8 w-8 bg-pink-100">
+              <AvatarFallback className="bg-pink-100 text-pink-700">
                 {(member.profiles?.full_name ?? "?")[0].toUpperCase()}
               </AvatarFallback>
             </Avatar>

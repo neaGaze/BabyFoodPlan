@@ -104,6 +104,7 @@ export function FoodCalendar({
           logs={logs}
           babyId={babyId}
           onDayClick={handleDayClick}
+          onUpdate={fetchLogs}
         />
       )}
       {view === "day" && (
@@ -117,6 +118,7 @@ export function FoodCalendar({
             setSelectedFood(null);
             setLogDialogOpen(true);
           }}
+          onUpdate={fetchLogs}
         />
       )}
       {view === "month" && (
@@ -125,6 +127,7 @@ export function FoodCalendar({
           logs={logs}
           babyId={babyId}
           onDayClick={handleDayClick}
+          onUpdate={fetchLogs}
         />
       )}
 
@@ -149,11 +152,13 @@ function WeekView({
   logs,
   babyId,
   onDayClick,
+  onUpdate,
 }: {
   date: Date;
   logs: FoodLogWithItem[];
   babyId: string;
   onDayClick: (d: Date) => void;
+  onUpdate?: () => void;
 }) {
   const days = getWeekDates(date);
   return (
@@ -165,6 +170,7 @@ function WeekView({
           logs={logs}
           babyId={babyId}
           onClick={() => onDayClick(d)}
+          onUpdate={onUpdate}
         />
       ))}
     </div>
@@ -176,11 +182,13 @@ function DayView({
   logs,
   babyId,
   onAddClick,
+  onUpdate,
 }: {
   date: Date;
   logs: FoodLogWithItem[];
   babyId: string;
   onAddClick: () => void;
+  onUpdate?: () => void;
 }) {
   const dayLogs = logs.filter((l) => isSameDay(new Date(l.fed_at), date));
   const groups = groupByTime(dayLogs);
@@ -208,7 +216,7 @@ function DayView({
           {groups.map((group, gi) => (
             <div key={gi} className="space-y-1 border-l-2 border-primary/20 pl-3">
               {group.map((log) => (
-                <FoodEntry key={log.id} log={log} babyId={babyId} />
+                <FoodEntry key={log.id} log={log} babyId={babyId} onUpdate={onUpdate} />
               ))}
             </div>
           ))}
@@ -223,11 +231,13 @@ function MonthView({
   logs,
   babyId,
   onDayClick,
+  onUpdate,
 }: {
   date: Date;
   logs: FoodLogWithItem[];
   babyId: string;
   onDayClick: (d: Date) => void;
+  onUpdate?: () => void;
 }) {
   const days = getMonthDates(date.getFullYear(), date.getMonth());
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -249,6 +259,7 @@ function MonthView({
             babyId={babyId}
             isCompact
             onClick={() => onDayClick(d)}
+            onUpdate={onUpdate}
           />
         ))}
       </div>

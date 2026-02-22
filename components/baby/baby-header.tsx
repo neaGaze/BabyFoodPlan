@@ -19,7 +19,7 @@ export function BabyHeader({ baby }: { baby: Baby }) {
   ];
 
   return (
-    <header className="border-b sticky top-0 bg-background z-10">
+    <header className="border-b border-pink-200/60 sticky top-0 bg-pink-50/80 backdrop-blur-sm z-10">
       <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/dashboard">
@@ -27,7 +27,7 @@ export function BabyHeader({ baby }: { baby: Baby }) {
               <LayoutDashboard className="h-4 w-4" />
             </Button>
           </Link>
-          <h1 className="font-bold text-lg">{baby.name}</h1>
+          <h1 className="font-bold text-lg">{"👶 "}{baby.name}</h1>
         </div>
         <div className="flex items-center gap-1">
           {links.map((link) => (

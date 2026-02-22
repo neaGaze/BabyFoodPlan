@@ -95,7 +95,7 @@ export function AddFoodDialog({ babyId }: { babyId: string }) {
               ))}
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button type="submit" className="w-full rounded-xl" disabled={pending}>
             {pending ? "Adding..." : "Add food"}
           </Button>
         </form>

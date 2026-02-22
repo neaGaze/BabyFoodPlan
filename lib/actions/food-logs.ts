@@ -8,7 +8,8 @@ export async function logFood(
   babyId: string,
   foodItemId: string,
   fedAt: string,
-  notes?: string
+  notes?: string,
+  reaction?: string | null
 ) {
   const supabase = await createClient();
   const {
@@ -22,6 +23,7 @@ export async function logFood(
     fed_at: fedAt,
     logged_by: user.id,
     notes: notes || null,
+    reaction: reaction || null,
   });
 
   if (error) return { error: error.message };
@@ -36,6 +38,27 @@ export async function deleteFoodLog(babyId: string, logId: string) {
   const { error } = await getAdminClient()
     .from("food_logs")
     .delete()
+    .eq("id", logId)
+    .eq("baby_id", babyId);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/baby/${babyId}`);
+}
+
+export async function updateFoodLog(
+  babyId: string,
+  logId: string,
+  updates: { fed_at?: string; notes?: string | null; reaction?: string | null }
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await getAdminClient()
+    .from("food_logs")
+    .update(updates)
     .eq("id", logId)
     .eq("baby_id", babyId);
 

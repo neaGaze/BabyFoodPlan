@@ -30,12 +30,14 @@ export function DayCell({
   babyId,
   isCompact = false,
   onClick,
+  onUpdate,
 }: {
   date: Date;
   logs: FoodLogWithItem[];
   babyId: string;
   isCompact?: boolean;
   onClick?: () => void;
+  onUpdate?: () => void;
 }) {
   const today = new Date();
   const isToday = isSameDay(date, today);
@@ -96,11 +98,11 @@ export function DayCell({
         {date.toLocaleDateString(undefined, { weekday: "short" })}{" "}
         {date.getDate()}
       </div>
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {groups.map((group, gi) => (
-          <div key={gi} className="space-y-0.5">
+          <div key={gi} className="space-y-1">
             {group.map((log) => (
-              <FoodEntry key={log.id} log={log} babyId={babyId} />
+              <FoodEntry key={log.id} log={log} babyId={babyId} onUpdate={onUpdate} />
             ))}
           </div>
         ))}

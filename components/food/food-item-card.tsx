@@ -54,7 +54,7 @@ export function FoodItemCard({
 
   return (
     <Card
-      className="p-3 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors"
+      className="p-3 flex items-center justify-between cursor-pointer hover:bg-pink-50/50 transition-colors rounded-xl shadow-sm"
       onClick={() => onSelect?.(food)}
     >
       <div className="flex items-center gap-2 min-w-0">

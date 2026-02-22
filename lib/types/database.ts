@@ -125,6 +125,7 @@ export type Database = {
           fed_at: string;
           logged_by: string | null;
           notes: string | null;
+          reaction: string | null;
         };
         Insert: {
           id?: string;
@@ -133,6 +134,7 @@ export type Database = {
           fed_at?: string;
           logged_by?: string | null;
           notes?: string | null;
+          reaction?: string | null;
         };
         Update: {
           id?: string;
@@ -141,6 +143,7 @@ export type Database = {
           fed_at?: string;
           logged_by?: string | null;
           notes?: string | null;
+          reaction?: string | null;
         };
         Relationships: [
           {
@@ -185,6 +188,8 @@ export type Baby = Database["public"]["Tables"]["babies"]["Row"];
 export type BabyMember = Database["public"]["Tables"]["baby_members"]["Row"];
 export type FoodItem = Database["public"]["Tables"]["food_items"]["Row"];
 export type FoodLog = Database["public"]["Tables"]["food_logs"]["Row"];
+export type FoodReaction = "loved" | "okay" | "disliked";
+
 export type FoodCategory =
   | "fruit"
   | "veggie"

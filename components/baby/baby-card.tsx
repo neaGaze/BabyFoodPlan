@@ -7,9 +7,9 @@ export function BabyCard({ baby }: { baby: Baby }) {
 
   return (
     <Link href={`/baby/${baby.id}`}>
-      <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+      <Card className="hover:bg-pink-50/50 transition-colors cursor-pointer border-pink-200/40 shadow-sm shadow-pink-100/50">
         <CardHeader>
-          <CardTitle>{baby.name}</CardTitle>
+          <CardTitle>{"👶 "}{baby.name}</CardTitle>
           <CardDescription>{age}</CardDescription>
         </CardHeader>
       </Card>

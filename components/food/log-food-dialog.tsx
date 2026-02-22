@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { logFood } from "@/lib/actions/food-logs";
-import { FoodItemWithDaysSince } from "@/lib/types/database";
+import { FoodItemWithDaysSince, FoodReaction } from "@/lib/types/database";
 import { toast } from "sonner";
 
 export function LogFoodDialog({
@@ -47,6 +47,7 @@ export function LogFoodDialog({
     defaultTime ?? now.toTimeString().slice(0, 5)
   );
   const [notes, setNotes] = useState("");
+  const [reaction, setReaction] = useState<FoodReaction | null>(null);
   const [pending, setPending] = useState(false);
 
   // Reset state when dialog opens
@@ -54,6 +55,7 @@ export function LogFoodDialog({
     if (!open) return;
     const now = new Date();
     setNotes("");
+    setReaction(null);
     setPending(false);
     setDate(defaultDate ?? now.toISOString().slice(0, 10));
     setTime(defaultTime ?? now.toTimeString().slice(0, 5));
@@ -92,7 +94,8 @@ export function LogFoodDialog({
         babyId,
         resolvedFood.id,
         fedAt,
-        notes || undefined
+        notes || undefined,
+        reaction
       );
       if (result?.error) {
         toast.error(result.error);
@@ -100,6 +103,7 @@ export function LogFoodDialog({
       }
       toast.success(`Logged ${resolvedFood.name}`);
       setNotes("");
+      setReaction(null);
       onOpenChange(false);
     } catch (err) {
       toast.error("Failed to log food");
@@ -168,8 +172,35 @@ export function LogFoodDialog({
               id="logNotes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. liked it, mixed with..."
+              placeholder="e.g. mixed with..."
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Reaction (optional)</Label>
+            <div className="flex gap-2">
+              {(
+                [
+                  { value: "loved", emoji: "\ud83d\ude0d", label: "Loved it" },
+                  { value: "okay", emoji: "\ud83d\ude10", label: "Okay" },
+                  { value: "disliked", emoji: "\ud83d\ude23", label: "Didn't like" },
+                ] as const
+              ).map((opt) => (
+                <Button
+                  key={opt.value}
+                  type="button"
+                  size="sm"
+                  variant={reaction === opt.value ? "default" : "outline"}
+                  onClick={() =>
+                    setReaction((prev) =>
+                      prev === opt.value ? null : opt.value
+                    )
+                  }
+                  className="flex-1"
+                >
+                  <span className="mr-1">{opt.emoji}</span> {opt.label}
+                </Button>
+              ))}
+            </div>
           </div>
           <Button
             type="submit"

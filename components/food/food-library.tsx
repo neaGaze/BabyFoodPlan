@@ -6,6 +6,8 @@ import { AddFoodDialog } from "./add-food-dialog";
 import { LogFoodDialog } from "./log-food-dialog";
 import { FoodCategory, FoodItemWithDaysSince, ALL_FOOD_CATEGORIES } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { normalizeCategory } from "@/lib/utils";
 
 const categoryLabels: Record<FoodCategory, string> = {
@@ -26,12 +28,16 @@ export function FoodLibrary({
   babyId: string;
 }) {
   const [filter, setFilter] = useState<FoodCategory | "all">("all");
+  const [search, setSearch] = useState("");
   const [selectedFood, setSelectedFood] =
     useState<FoodItemWithDaysSince | null>(null);
   const [logOpen, setLogOpen] = useState(false);
 
-  const filtered =
-    filter === "all" ? foods : foods.filter((f) => normalizeCategory(f.category).includes(filter));
+  const filtered = foods.filter((f) => {
+    const matchesCategory = filter === "all" || normalizeCategory(f.category).includes(filter);
+    const matchesSearch = !search || f.name.toLowerCase().includes(search.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   function handleSelect(food: FoodItemWithDaysSince) {
     setSelectedFood(food);
@@ -43,6 +49,16 @@ export function FoodLibrary({
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Food Library</h2>
         <AddFoodDialog babyId={babyId} />
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search foods..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
 
       <div className="flex gap-1 flex-wrap">

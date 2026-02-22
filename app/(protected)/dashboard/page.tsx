@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen p-4 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h1 className="text-2xl font-bold">My Babies</h1>
         <form action={signOut}>
           <Button variant="ghost" size="sm">
@@ -23,6 +23,7 @@ export default async function DashboardPage() {
           </Button>
         </form>
       </div>
+      <p className="text-muted-foreground mb-6">{"🍼 Baby Food Tracker"}</p>
 
       <div className="grid gap-4">
         {babies?.map((baby) => <BabyCard key={baby.id} baby={baby} />)}
