@@ -13,8 +13,12 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export function RegisterForm() {
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | undefined, formData: FormData) => {
       const result = await signUp(formData);
@@ -33,6 +37,7 @@ export function RegisterForm() {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
+          {next && <input type="hidden" name="next" value={next} />}
           {state?.error && (
             <p className="text-sm text-destructive">{state.error}</p>
           )}
@@ -65,7 +70,7 @@ export function RegisterForm() {
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="underline text-primary">
+            <Link href={`/login${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="underline text-primary">
               Sign in
             </Link>
           </p>

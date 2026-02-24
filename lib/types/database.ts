@@ -82,6 +82,47 @@ export type Database = {
           },
         ];
       };
+      baby_invitations: {
+        Row: {
+          id: string;
+          baby_id: string;
+          email: string;
+          invited_by: string | null;
+          token: string;
+          status: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          email: string;
+          invited_by?: string | null;
+          token?: string;
+          status?: string;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          email?: string;
+          invited_by?: string | null;
+          token?: string;
+          status?: string;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "baby_invitations_baby_id_fkey";
+            columns: ["baby_id"];
+            isOneToOne: false;
+            referencedRelation: "babies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       food_items: {
         Row: {
           id: string;
@@ -188,6 +229,7 @@ export type Baby = Database["public"]["Tables"]["babies"]["Row"];
 export type BabyMember = Database["public"]["Tables"]["baby_members"]["Row"];
 export type FoodItem = Database["public"]["Tables"]["food_items"]["Row"];
 export type FoodLog = Database["public"]["Tables"]["food_logs"]["Row"];
+export type BabyInvitation = Database["public"]["Tables"]["baby_invitations"]["Row"];
 export type FoodReaction = "loved" | "okay" | "disliked";
 
 export type FoodCategory =

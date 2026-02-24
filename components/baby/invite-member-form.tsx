@@ -7,29 +7,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { inviteMember } from "@/lib/actions/babies";
 import { toast } from "sonner";
-import { UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { UserPlus, Loader2, CheckCircle2, Copy } from "lucide-react";
 
 export function InviteMemberForm({ babyId }: { babyId: string }) {
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
     setSuccess(false);
+    setInviteLink(null);
     const result = await inviteMember(babyId, email);
     setPending(false);
     if (result?.error) {
       toast.error(result.error);
       return;
     }
-    toast.success("Member added successfully!");
+    if (result?.acceptUrl) {
+      toast.info("Email couldn't be sent — share the link manually");
+      setInviteLink(result.acceptUrl);
+    } else {
+      toast.success("Invitation email sent!");
+    }
     setEmail("");
     setSuccess(true);
     router.refresh();
-    setTimeout(() => setSuccess(false), 3000);
+    setTimeout(() => setSuccess(false), 5000);
   }
 
   return (
@@ -63,12 +70,34 @@ export function InviteMemberForm({ babyId }: { babyId: string }) {
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        The person must have an account already
+        An invitation email will be sent
       </p>
-      {success && (
+      {success && !inviteLink && (
         <div className="flex items-center gap-1.5 text-xs text-emerald-600">
           <CheckCircle2 className="h-3.5 w-3.5" />
           <span>Invitation sent successfully</span>
+        </div>
+      )}
+      {inviteLink && (
+        <div className="space-y-1.5">
+          <p className="text-xs text-amber-600 font-medium">Share this link manually:</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded-lg truncate">
+              {inviteLink}
+            </code>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 shrink-0"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.origin + inviteLink);
+                toast.success("Link copied!");
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
       )}
     </form>
