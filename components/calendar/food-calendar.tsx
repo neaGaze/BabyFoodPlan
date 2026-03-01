@@ -162,7 +162,7 @@ function WeekView({
 }) {
   const days = getWeekDates(date);
   return (
-    <div className="grid grid-cols-7 gap-1">
+    <div className="grid grid-cols-7 gap-1 [&>*]:min-w-0">
       {days.map((d) => (
         <DayCell
           key={d.toISOString()}

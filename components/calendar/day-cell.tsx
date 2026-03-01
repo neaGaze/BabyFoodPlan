@@ -85,24 +85,24 @@ export function DayCell({
     <div
       onClick={onClick}
       className={cn(
-        "p-2 border rounded min-h-[100px] cursor-pointer hover:bg-muted/30 transition-colors",
+        "p-1.5 border rounded min-h-[100px] cursor-pointer hover:bg-muted/30 transition-colors overflow-hidden flex flex-col",
         isToday && "ring-2 ring-primary"
       )}
     >
       <div
         className={cn(
-          "text-xs font-semibold mb-1",
+          "text-xs font-semibold mb-1 shrink-0",
           isToday && "text-primary"
         )}
       >
         {date.toLocaleDateString(undefined, { weekday: "short" })}{" "}
         {date.getDate()}
       </div>
-      <div className="space-y-2">
+      <div className="space-y-0.5 overflow-y-auto min-h-0 flex-1 scrollbar-thin">
         {groups.map((group, gi) => (
-          <div key={gi} className="space-y-1">
+          <div key={gi} className="space-y-0.5">
             {group.map((log) => (
-              <FoodEntry key={log.id} log={log} babyId={babyId} onUpdate={onUpdate} />
+              <FoodEntry key={log.id} log={log} babyId={babyId} compact onUpdate={onUpdate} />
             ))}
           </div>
         ))}
