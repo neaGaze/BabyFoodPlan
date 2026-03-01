@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Baby } from "@/lib/types/database";
-import { CalendarDays, UtensilsCrossed, Users, LogOut, LayoutDashboard } from "lucide-react";
+import { CalendarDays, UtensilsCrossed, Users, LogOut, LayoutDashboard, BarChart3 } from "lucide-react";
 
 export function BabyHeader({ baby }: { baby: Baby }) {
   const pathname = usePathname();
@@ -16,6 +16,7 @@ export function BabyHeader({ baby }: { baby: Baby }) {
     { href: base, label: "Calendar", icon: CalendarDays },
     { href: `${base}/foods`, label: "Foods", icon: UtensilsCrossed },
     { href: `${base}/members`, label: "Members", icon: Users },
+    { href: `${base}/statistics`, label: "Stats", icon: BarChart3 },
   ];
 
   return (

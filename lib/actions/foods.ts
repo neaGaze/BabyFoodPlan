@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
-import { FoodCategory, FoodItemWithDaysSince } from "@/lib/types/database";
+import { FoodCategory, FoodItemWithDaysSince, FoodItemWithStats, FoodReaction } from "@/lib/types/database";
 
 export async function createFood(
   babyId: string,
@@ -66,6 +66,62 @@ export async function getFoodLibrary(
   });
 
   return { data: foodsWithDays };
+}
+
+export async function getFoodStats(
+  babyId: string
+): Promise<{ data: FoodItemWithStats[] | null; error?: string }> {
+  const admin = getAdminClient();
+
+  const { data: foods, error } = await admin
+    .from("food_items")
+    .select("*")
+    .eq("baby_id", babyId)
+    .order("name");
+
+  if (error) return { error: error.message, data: null };
+  if (!foods?.length) return { data: [] };
+
+  const { data: logs } = await admin
+    .from("food_logs")
+    .select("food_item_id, fed_at, reaction")
+    .eq("baby_id", babyId)
+    .order("fed_at", { ascending: false });
+
+  const now = new Date();
+  const mapped = foods.map((food) => {
+    const latestLog = logs?.find((l) => l.food_item_id === food.id);
+    if (!latestLog) return null;
+    const fedDate = new Date(latestLog.fed_at);
+    const diffMs = now.getTime() - fedDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return {
+      ...food,
+      days_since_last_fed: diffDays,
+      last_fed_at: latestLog.fed_at,
+      last_reaction: (latestLog.reaction as FoodReaction) ?? null,
+    };
+  });
+  const foodsWithStats: FoodItemWithStats[] = mapped
+    .filter((f) => f !== null)
+    .sort((a, b) => (b.days_since_last_fed ?? 0) - (a.days_since_last_fed ?? 0));
+
+  return { data: foodsWithStats };
+}
+
+export async function toggleStatsDismissed(babyId: string, foodId: string, dismissed: boolean) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await getAdminClient()
+    .from("food_items")
+    .update({ stats_dismissed: dismissed })
+    .eq("id", foodId)
+    .eq("baby_id", babyId);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/baby/${babyId}/statistics`);
 }
 
 export async function deleteFood(babyId: string, foodId: string) {

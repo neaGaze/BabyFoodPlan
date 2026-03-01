@@ -131,6 +131,7 @@ export type Database = {
           category: string[];
           created_by: string | null;
           created_at: string;
+          stats_dismissed: boolean;
         };
         Insert: {
           id?: string;
@@ -139,12 +140,14 @@ export type Database = {
           category?: string[];
           created_by?: string | null;
           created_at?: string;
+          stats_dismissed?: boolean;
         };
         Update: {
           id?: string;
           baby_id?: string;
           name?: string;
           category?: string[];
+          stats_dismissed?: boolean;
           created_by?: string | null;
           created_at?: string;
         };
@@ -244,6 +247,11 @@ export type FoodCategory =
 export type FoodItemWithDaysSince = FoodItem & {
   days_since_last_fed: number | null;
   last_fed_at: string | null;
+};
+
+export type FoodItemWithStats = FoodItemWithDaysSince & {
+  last_reaction: FoodReaction | null;
+  stats_dismissed: boolean;
 };
 
 export type FoodLogWithItem = FoodLog & {
